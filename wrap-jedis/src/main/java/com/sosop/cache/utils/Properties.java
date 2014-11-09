@@ -14,9 +14,7 @@ import org.apache.log4j.Logger;
 import redis.clients.jedis.JedisPoolConfig;
 
 import com.sosop.cache.cluster.Cluster;
-import com.sosop.cache.node.MasterNode;
 import com.sosop.cache.node.Node;
-import com.sosop.cache.node.SlaveNode;
 
 public class Properties {
 
@@ -75,7 +73,8 @@ public class Properties {
 				}
 			}
 			if ("[master]".equals(lines[index].trim())) {
-				MasterNode master = new MasterNode();
+				Node master = new Node();
+				master.setFlag(Constant.MASTER);
 				index++;
 				while (!lines[index].startsWith("[")) {
 					if (!skip(lines[index])
@@ -90,7 +89,7 @@ public class Properties {
 				cluster.addNode(master);
 			}
 			if ("[slave]".equals(lines[index].trim())) {
-				SlaveNode slave = new SlaveNode();
+				Node slave = new Node();
 				index++;
 				while (!lines[index].startsWith("[")) {
 					if (!skip(lines[index])
@@ -175,8 +174,8 @@ public class Properties {
 		return false;
 	}
 
-	private MasterNode master(Cluster cluster, String name) {
-		for (MasterNode node : cluster.getNodes()) {
+	private Node master(Cluster cluster, String name) {
+		for (Node node : cluster.getNodes()) {
 			if (node.getName().equals(name)) {
 				return node;
 			}

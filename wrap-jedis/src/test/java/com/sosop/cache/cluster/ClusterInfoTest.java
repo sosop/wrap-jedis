@@ -26,6 +26,9 @@ public class ClusterInfoTest {
 	public void testCluster() {
 		Cluster c1 = info.cluster("mycluster1");
 		assertThat(c1, Matchers.is(info.getClusters().get(0)));
+		assertThat(c1.getNodes().get(0).getSlaves().size(), Matchers.greaterThanOrEqualTo(1));
+		assertThat(c1.getNodes().get(0).getMaster(), Matchers.nullValue());
+		assertThat(c1.getNodes().get(0).getFlag(), Matchers.is(1));
 		
 		Cluster c2 = info.cluster("mycluster2");
 		assertThat(c2, Matchers.is(info.getClusters().get(1)));
@@ -41,5 +44,5 @@ public class ClusterInfoTest {
 		
 		Cluster c6 = info.rule("mycluster2");
 		assertThat(c6, Matchers.is(info.getClusters().get(1)));
-	}
+	}	
 }

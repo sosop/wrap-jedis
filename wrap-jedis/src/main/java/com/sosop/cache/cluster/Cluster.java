@@ -7,7 +7,7 @@ import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.JedisShardInfo;
 import redis.clients.jedis.ShardedJedisPool;
 
-import com.sosop.cache.node.MasterNode;
+import com.sosop.cache.node.Node;
 
 /**
  * 
@@ -25,7 +25,7 @@ public class Cluster {
 	private int weight;
 	private ShardedJedisPool pool;
 	private JedisPoolConfig config;
-	private List<MasterNode> nodes;
+	private List<Node> nodes;
 	private List<JedisShardInfo> shards;
 
 	public Cluster() {
@@ -76,23 +76,23 @@ public class Cluster {
 		this.weight = weight;
 	}
 
-	public List<MasterNode> getNodes() {
+	public List<Node> getNodes() {
 		return nodes;
 	}
 
-	public boolean addNode(MasterNode node) {
+	public boolean addNode(Node node) {
 		return this.nodes.add(node);
 	}
 	
-	public void addNode(int index, MasterNode node) {
+	public void addNode(int index, Node node) {
 		this.nodes.add(index, node);
 	}
 	
-	public int getIndex(MasterNode node) {
+	public int getIndex(Node node) {
 		return this.nodes.indexOf(node);
 	}
 	
-	public MasterNode remove(int index) {
+	public Node remove(int index) {
 		return this.nodes.remove(index);
 	}
 
@@ -110,7 +110,7 @@ public class Cluster {
 	
 	private void nodesToShards() {
 		shards.clear();
-		for (MasterNode master : nodes) {
+		for (Node master : nodes) {
 			JedisShardInfo info = new JedisShardInfo(master.getHost(), master.getPort(), master.getTimeout(), master.getWeight());
 			shards.add(info);
 		}
