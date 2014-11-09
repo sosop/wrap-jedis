@@ -38,6 +38,7 @@ public class Properties {
 
 	private List<Cluster> parse(String kvs) throws IllegalAccessException,
 			InvocationTargetException {
+		String pattern = System.getProperty("os.name").contains("indow") ? "\r\n" : "\n";
 		List<Cluster> clusters = new ArrayList<>();
 		Cluster cluster = null;
 		List<Field> clusterFields = Arrays.asList(Cluster.class
@@ -49,7 +50,7 @@ public class Properties {
 		poolFields.addAll(Arrays.asList(fields1));
 		poolFields.addAll(Arrays.asList(fields2));
 
-		String[] lines = kvs.split("\n");
+		String[] lines = kvs.split(pattern);
 		int index = 0;
 		int length = lines.length;
 		String[] kv = null;
