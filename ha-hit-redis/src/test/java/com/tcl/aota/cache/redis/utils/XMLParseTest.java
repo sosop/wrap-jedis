@@ -8,7 +8,8 @@ import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.tcl.aota.cache.redis.cluster.Cluster;
+import com.sosop.cache.redis.cluster.Cluster;
+import com.sosop.cache.redis.utils.XMLParse;
 
 
 public class XMLParseTest {

@@ -6,8 +6,11 @@ import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.tcl.aota.cache.redis.rule.ClusterSerialRule;
-import com.tcl.aota.cache.redis.utils.XMLParse;
+import com.sosop.cache.redis.cluster.Cluster;
+import com.sosop.cache.redis.cluster.ClusterInfo;
+import com.sosop.cache.redis.cluster.ClusterXML;
+import com.sosop.cache.redis.rule.ClusterSerialRule;
+import com.sosop.cache.redis.utils.XMLParse;
 
 public class ClusterXmlTest {
 	private ClusterInfo infoXml;
