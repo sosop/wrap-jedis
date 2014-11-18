@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<clusters>
+	<cluster name="aota" serial="1" weight="20">
+
+		<node>
+			<flag>1</flag>
+			<name>aota-cache-m1</name>
+			<host>172.26.50.19</host>
+			<port>6380</port>
+			<timeout>1000</timeout>
+			<weight>10</weight>
+			<password></password>
+			<slaveof></slaveof>
+		</node>
+
+		<node>
+			<flag>0</flag>
+			<name>aota-cache-s1</name>
+			<host>172.26.50.19</host>
+			<port>6381</port>
+			<timeout>1000</timeout>
+			<weight>10</weight>
+			<password></password>
+			<slaveof>aota-cache-m1</slaveof>
+		</node>
+
+		<node>
+			<flag>1</flag>
+			<name>aota-cache-m2</name>
+			<host>172.26.50.19</host>
+			<port>6382</port>
+			<timeout>1000</timeout>
+			<weight>10</weight>
+			<password></password>
+			<slaveof></slaveof>
+		</node>
+		<pool-config>
+			<maxTotal>100</maxTotal>
+			<maxIdle>50</maxIdle>
+			<minIdle>1</minIdle>
+			<testOnBorrow>true</testOnBorrow>
+			<testOnReturn>true</testOnReturn>
+			<testWhileIdle>true</testWhileIdle>
+			<numTestsPerEvictionRun>500</numTestsPerEvictionRun>
+			<timeBetweenEvictionRunsMillis>
+				60000
+			</timeBetweenEvictionRunsMillis>
+		</pool-config>
+	</cluster>
+
+
+	<settings>
+		<replication>true</replication>
+		<hitCount>true</hitCount>
+	</settings>
+	<!-- <share-pool-config> <pool-config> <maxTotal>100</maxTotal> <maxIdle>50</maxIdle> 
+		<minIdle>1</minIdle> <testOnBorrow>true</testOnBorrow> <testOnReturn>true</testOnReturn> 
+		<testWhileIdle>true</testWhileIdle> <numTestsPerEvictionRun>500</numTestsPerEvictionRun> 
+		<timeBetweenEvictionRunsMillis> 60000 </timeBetweenEvictionRunsMillis> </pool-config> 
+		</share-pool-config> -->
+</clusters>

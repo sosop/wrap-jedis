@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-
+	
 	<parent>
 		<groupId>com.sosop.base</groupId>
 		<artifactId>base-setting</artifactId>
@@ -9,9 +9,10 @@
 		<relativePath>../base/pom.xml</relativePath>
 	</parent>
 
-	<artifactId>cache-redis</artifactId>
+
+	<artifactId>cache-redis-client</artifactId>
 	<packaging>jar</packaging>
-	<name>cache-redis</name>
+	<name>cache-redis-client</name>
 
 	<build>
 		<finalName>cache-redis</finalName>
@@ -25,52 +26,19 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-resources-plugin</artifactId>
 				</plugin>
-				<plugin>
-					<artifactId>maven-assembly-plugin</artifactId>
-					<configuration>
-						<appendAssemblyId>false</appendAssemblyId>
-						<descriptorRefs>
-							<descriptorRef>jar-with-dependencies</descriptorRef>
-						</descriptorRefs>
-						<archive>
-							<manifest>
-								<mainClass>com.sosop.cache.redis.thrift.Server</mainClass>
-							</manifest>
-						</archive>
-					</configuration>
-					<executions>
-						<execution>
-							<id>make-assembly</id>
-							<phase>package</phase>
-							<goals>
-								<goal>assembly</goal>
-							</goals>
-						</execution>
-					</executions>
-				</plugin>
 			</plugins>
 		</pluginManagement>
 	</build>
 
+
 	<dependencies>
-		<!-- jedis -->
-		<dependency>
-			<groupId>redis.clients</groupId>
-			<artifactId>jedis</artifactId>
-		</dependency>
-		<!-- jedis -->
 		<!-- log4j -->
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
 		</dependency>
 		<!-- log4j -->
-		<!-- bean utlis -->
-		<dependency>
-			<groupId>commons-beanutils</groupId>
-			<artifactId>commons-beanutils</artifactId>
-		</dependency>
-		<!-- bean utils -->
+
 		<!-- junit -->
 		<dependency>
 			<groupId>junit</groupId>
@@ -89,33 +57,12 @@
 			<scope>test</scope>
 		</dependency>
 		<!-- junit -->
-		<!-- reflectASM -->
-		<dependency>
-			<groupId>com.esotericsoftware.reflectasm</groupId>
-			<artifactId>reflectasm</artifactId>
-		</dependency>
-		<!-- reflectASM -->
-		<!-- jdom -->
-		<dependency>
-			<groupId>org.jdom</groupId>
-			<artifactId>jdom</artifactId>
-		</dependency>
-		<!-- jdom -->
+
 		<!-- thrift -->
 		<dependency>
 			<groupId>org.apache.thrift</groupId>
 			<artifactId>libthrift</artifactId>
 		</dependency>
 		<!-- thrift -->
-		<!-- log -->
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
-		</dependency>
-		<!-- log -->
 	</dependencies>
 </project>

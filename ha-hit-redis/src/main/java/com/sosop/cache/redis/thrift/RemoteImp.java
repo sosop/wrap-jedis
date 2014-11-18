@@ -1,114 +1,99 @@
 package com.sosop.cache.redis.thrift;
 
 import java.nio.ByteBuffer;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.thrift.TException;
 
 import com.sosop.cache.redis.cluster.ClusterInfo;
 import com.sosop.cache.redis.cluster.ClusterXML;
+import com.sosop.cache.redis.utils.ObjectUtil;
 
 
 public class RemoteImp implements Remote.Iface {
 
 	private final static ClusterInfo info = new ClusterXML();
-	
+
 	@Override
-	public String setS(ByteBuffer cluster, String key, String value) throws TException {
-		return info.cluster(cluster).set(key, value);
+	public String setS(String cluster, String key, String value) throws TException {
+		return info.cluster(ObjectUtil.object(cluster)).set(key, value);
 	}
 
 	@Override
-	public String get(ByteBuffer cluster, String key) throws TException {
-		// TODO Auto-generated method stub
-		return null;
+	public String get(String cluster, String key) throws TException {
+		return info.cluster(ObjectUtil.object(cluster)).get(key);
 	}
 
 	@Override
-	public long delS(ByteBuffer cluster, String key) throws TException {
-		// TODO Auto-generated method stub
-		return 0;
+	public long delS(String cluster, String key) throws TException {
+		return info.cluster(ObjectUtil.object(cluster)).del(key);
 	}
 
 	@Override
-	public String lpopList(ByteBuffer cluster, String key) throws TException {
-		// TODO Auto-generated method stub
-		return null;
+	public String lpopList(String cluster, String key) throws TException {
+		return info.cluster(ObjectUtil.object(cluster)).lpopList(key);
 	}
 
 	@Override
-	public long rpushList(ByteBuffer cluster, String key, String values) throws TException {
-		// TODO Auto-generated method stub
-		return 0;
+	public long rpushList(String cluster, String key, String values) throws TException {
+		return info.cluster(ObjectUtil.object(cluster)).rpushList(key, values);
 	}
 
 	@Override
-	public long expire(ByteBuffer cluster, String key, int time) throws TException {
-		// TODO Auto-generated method stub
-		return 0;
+	public long expire(String cluster, String key, int time) throws TException {
+		return info.cluster(ObjectUtil.object(cluster)).expire(key, time);
 	}
 
 	@Override
-	public long hsetnx(ByteBuffer cluster, String key, String field, String value)
+	public long hsetnx(String cluster, String key, String field, String value) throws TException {
+		return info.cluster(ObjectUtil.object(cluster)).hsetnx(key, field, value);
+	}
+
+	@Override
+	public boolean exist(String cluster, String key) throws TException {
+		return info.cluster(ObjectUtil.object(cluster)).exist(key);
+	}
+
+	@Override
+	public boolean existInSet(String cluster, String key, String member) throws TException {
+		return info.cluster(ObjectUtil.object(cluster)).existInSet(key, member);
+	}
+
+	@Override
+	public long saddSet(String cluster, String key, List<String> members) throws TException {
+		return info.cluster(ObjectUtil.object(cluster)).saddSet(key, ObjectUtil.CollectTo(members));
+	}
+
+	@Override
+	public long sremSet(String cluster, String key, List<String> members) throws TException {
+		return info.cluster(ObjectUtil.object(cluster)).sremSet(key, ObjectUtil.CollectTo(members));
+	}
+
+	@Override
+	public String spopSet(String cluster, String key) throws TException {
+		return info.cluster(ObjectUtil.object(cluster)).spopSet(key);
+	}
+
+	@Override
+	public long hSet(String cluster, ByteBuffer key, ByteBuffer field, ByteBuffer value)
 			throws TException {
-		// TODO Auto-generated method stub
-		return 0;
+		return info.cluster(ObjectUtil.object(cluster)).hSet(key.array(), field.array(), value.array());
 	}
 
 	@Override
-	public boolean exist(ByteBuffer cluster, String key) throws TException {
-		// TODO Auto-generated method stub
-		return false;
+	@SuppressWarnings("all")
+	public Map hGetAll(String cluster, ByteBuffer key) throws TException {
+		return info.cluster(ObjectUtil.object(cluster)).hGetAll(key.array());
 	}
 
 	@Override
-	public boolean existInSet(ByteBuffer cluster, String key, String member) throws TException {
-		// TODO Auto-generated method stub
-		return false;
+	public ByteBuffer hGet(String cluster, ByteBuffer key, ByteBuffer field) throws TException {
+		return ByteBuffer.wrap(info.cluster(ObjectUtil.object(cluster)).hGet(key.array(), field.array()));
 	}
 
 	@Override
-	public long saddSet(ByteBuffer cluster, String key, ByteBuffer members) throws TException {
-		// TODO Auto-generated method stub
-		return 0;
+	public long delB(String cluster, ByteBuffer key) throws TException {
+		return info.cluster(ObjectUtil.object(cluster)).del(key.array());
 	}
-
-	@Override
-	public long sremSet(ByteBuffer cluster, String key, ByteBuffer members) throws TException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public String spopSet(ByteBuffer cluster, String key) throws TException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public long hSet(ByteBuffer cluster, ByteBuffer key, ByteBuffer field, ByteBuffer value)
-			throws TException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public Map<ByteBuffer, ByteBuffer> hGetAll(ByteBuffer cluster, ByteBuffer key)
-			throws TException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ByteBuffer hGet(ByteBuffer cluster, ByteBuffer key, ByteBuffer field) throws TException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public long delB(ByteBuffer cluster, ByteBuffer key) throws TException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-	
 }

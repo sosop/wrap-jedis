@@ -10,7 +10,7 @@ import com.sosop.cache.redis.heartbeat.HeartBeat;
 import com.sosop.cache.redis.rule.DefaultRule;
 import com.sosop.cache.redis.rule.Rule;
 import com.sosop.cache.redis.statistics.Hits;
-import com.sosop.cache.redis.utils.BufUtil;
+import com.sosop.cache.redis.utils.ObjectUtil;
 
 public abstract class ClusterInfo {
 
@@ -29,7 +29,7 @@ public abstract class ClusterInfo {
 	}
 	
 	public Cluster cluster(ByteBuffer buff) {
-		return map.get(BufUtil.BufToObj(buff));
+		return map.get(ObjectUtil.BufToObj(buff));
 	}
 	
 	public Cluster rule(Object obj) {
@@ -37,7 +37,7 @@ public abstract class ClusterInfo {
 	}
 	
 	public Cluster rule(ByteBuffer buff) {
-		return rule.getCluster(BufUtil.BufToObj(buff));
+		return rule.getCluster(ObjectUtil.BufToObj(buff));
 	}
 	
 	protected void config() {

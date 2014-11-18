@@ -12,6 +12,7 @@
 
 	<modules>
 		<module>../ha-hit-redis</module>
+		<module>../cache-redis-client</module>
 	</modules>
 
 	<properties>
