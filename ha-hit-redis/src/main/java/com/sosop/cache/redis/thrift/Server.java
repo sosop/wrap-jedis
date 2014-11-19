@@ -1,5 +1,9 @@
 package com.sosop.cache.redis.thrift;
 
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Paths;
+
 import org.apache.log4j.Logger;
 import org.apache.thrift.TProcessor;
 import org.apache.thrift.protocol.TBinaryProtocol;
@@ -18,9 +22,14 @@ public class Server {
 
 	public static void main(String[] args) {
 		if(args.length != 1) {
+			LOG.error("please input redis clusters configuration file");
 			return;
 		}
 		final String path = args[0];
+		if(Files.notExists(Paths.get(path), LinkOption.NOFOLLOW_LINKS)) {
+			LOG.error("can not find the file, path does not exsit!");
+			return;
+		}
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
