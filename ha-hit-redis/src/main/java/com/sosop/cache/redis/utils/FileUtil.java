@@ -39,7 +39,8 @@ public class FileUtil {
 		if (StringUtil.isNull(path)) {
 			path = DEFAUL_PATH;
 		}
-		try (RandomAccessFile rf = new RandomAccessFile(path, "rw"); FileChannel channel = rf.getChannel();) {
+		try (RandomAccessFile rf = new RandomAccessFile(path, "rw");
+				FileChannel channel = rf.getChannel();) {
 			channel.position(channel.size());
 			channel.write(MappedByteBuffer.wrap(StringUtil.append(value, "\n").getBytes()));
 		} catch (IOException e) {
@@ -100,7 +101,8 @@ public class FileUtil {
 	public static String read(String filename) {
 		StringBuffer sb = new StringBuffer();
 
-		try (RandomAccessFile file = new RandomAccessFile(getConfigFile(filename), "r"); FileChannel channel = file.getChannel();) {
+		try (RandomAccessFile file = new RandomAccessFile(getConfigFile(filename), "r");
+				FileChannel channel = file.getChannel();) {
 			ByteBuffer buf = MappedByteBuffer.allocateDirect(512);
 			while (channel.read(buf) > 0) {
 				buf.flip();
@@ -120,10 +122,11 @@ public class FileUtil {
 	public static String getPath(String filename) {
 		String baseDir = FileUtil.class.getResource("/").getPath();
 		String fullPath = StringUtil.append(baseDir, filename);
-		fullPath = System.getProperty("os.name").contains("indow") ? fullPath.substring(1) : fullPath;
+		fullPath = System.getProperty("os.name").contains("indow") ? fullPath.substring(1)
+				: fullPath;
 		return fullPath;
 	}
-	
+
 	public static File getConfigFile(String filename) {
 
 		Path path = Paths.get(getPath(filename));
@@ -131,7 +134,6 @@ public class FileUtil {
 		if (Files.notExists(path, LinkOption.NOFOLLOW_LINKS)) {
 			path = path.getParent().resolveSibling(StringUtil.append("classes/", filename));
 		}
-
 		return path.toFile();
 	}
 }

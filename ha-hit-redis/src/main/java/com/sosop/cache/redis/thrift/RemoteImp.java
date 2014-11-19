@@ -7,13 +7,16 @@ import java.util.Map;
 import org.apache.thrift.TException;
 
 import com.sosop.cache.redis.cluster.ClusterInfo;
-import com.sosop.cache.redis.cluster.ClusterXML;
 import com.sosop.cache.redis.utils.ObjectUtil;
 
 
 public class RemoteImp implements Remote.Iface {
 
-	private final static ClusterInfo info = new ClusterXML();
+	private ClusterInfo info;
+	
+	public RemoteImp(ClusterInfo info) {
+		this.info = info;
+	}
 
 	@Override
 	public String setS(String cluster, String key, String value) throws TException {

@@ -13,6 +13,10 @@
 	<packaging>jar</packaging>
 	<name>cache-redis</name>
 
+	<properties>
+        <maven.test.skip>true</maven.test.skip>
+    </properties>
+
 	<build>
 		<finalName>cache-redis</finalName>
 		<pluginManagement>

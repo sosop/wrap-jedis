@@ -55,8 +55,8 @@ public class ClusterXmlTest {
 	@Test
 	public void testXMLRedisOpt() {
 		Cluster cx1 = infoXml.cluster(1);
-		assertThat(cx1.set("c1", "xml-cluster1"), Matchers.is((Object)"OK"));
-		assertThat(cx1.get("c1"), Matchers.is((Object)"xml-cluster1"));
+		assertThat(cx1.set("test", "xml-cluster1"), Matchers.is((Object)"OK"));
+		assertThat(cx1.get("test"), Matchers.is((Object)"xml-cluster1"));
 		try {
 			XMLParse.toXML(infoXml.getClusters());
 		} catch (Exception e) {

@@ -1,5 +1,6 @@
 package com.sosop.cache.redis.utils;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -33,7 +34,7 @@ import com.sosop.cache.redis.node.Node;
 
 public class XMLParse {
 	private final static Logger LOG = Logger.getLogger(Properties.class);
-	private final static String lastFile = "redis-cluster-final.xml";
+	private final static String lastFile = "/tmp/redis-cluster-final.xml";
 	
 	private SAXBuilder sax;
 
@@ -42,20 +43,19 @@ public class XMLParse {
 	}
 
 	public List<Cluster> load(String filename) {
-		String loadfile;
-		Path path = Paths.get(FileUtil.getPath(lastFile));
-		if(Files.exists(path, LinkOption.NOFOLLOW_LINKS)) {
-			loadfile = lastFile;
-		} else {
-			loadfile = filename;
+		// Path path = Paths.get(FileUtil.getPath(lastFile));
+		// find file in tmp dir
+		Path path = Paths.get(lastFile);
+		if(Files.notExists(path, LinkOption.NOFOLLOW_LINKS)) {
+			path = Paths.get(filename);
 		}
-		return this.parse(loadfile);
+		return this.parse(path.toFile());
 	}
 
-	public List<Cluster> parse(String filename) {
+	public List<Cluster> parse(File file) {
 		List<Cluster> clusters = new ArrayList<>();
 		try {
-			Document doc = sax.build(FileUtil.getConfigFile(filename));
+			Document doc = sax.build(file);
 			// root element
 			Element root = doc.getRootElement();
 			if ("clusters".equalsIgnoreCase(root.getName())) {
@@ -253,7 +253,7 @@ public class XMLParse {
 		
 		Document doc = new Document(root);
 		XMLOutputter out = new XMLOutputter();
-		out.output(doc, new FileOutputStream(FileUtil.getPath("redis-cluster-final.xml")));
+		out.output(doc, new FileOutputStream(Paths.get(lastFile).toFile()));
 		
 	}
 }

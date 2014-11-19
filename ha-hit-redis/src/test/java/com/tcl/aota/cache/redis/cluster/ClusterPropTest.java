@@ -53,8 +53,8 @@ public class ClusterPropTest {
 	@Test
 	public void testRedisOpt() {
 		Cluster c1 = infoProp.cluster(1);
-		assertThat(c1.set("c1", "cluster1"), Matchers.is((Object)"OK"));
-		assertThat(c1.get("c1"), Matchers.is((Object)"cluster1"));
+		assertThat(c1.set("test", "thrift"), Matchers.is((Object)"OK"));
+		assertThat(c1.get("test"), Matchers.is((Object)"thrift"));
 		/*Cluster c2 = infoProp.cluster(2);
 		assertThat(c2.set("c2", "cluster2"), Matchers.is((Object)"OK"));
 		assertThat(c2.get("c2"), Matchers.is((Object)"cluster2"));*/
