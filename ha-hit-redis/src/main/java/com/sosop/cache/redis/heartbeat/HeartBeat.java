@@ -1,10 +1,11 @@
 package com.sosop.cache.redis.heartbeat;
 
-import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 
@@ -12,16 +13,15 @@ import redis.clients.jedis.Protocol;
 
 import com.sosop.cache.redis.cluster.Cluster;
 import com.sosop.cache.redis.node.Node;
+import com.sosop.cache.redis.utils.Constant;
 import com.sosop.cache.redis.utils.StringUtil;
 import com.sosop.cache.redis.utils.XMLParse;
 
 public class HeartBeat extends Thread {
-	private final static Logger LOG = Logger.getLogger(HeartBeat.class);
+	private final Logger LOG = Logger.getLogger(HeartBeat.class);
 	private final static HeartBeat beat = new HeartBeat();
-	private Map<Cluster, Map<Node, NodeConnection>> cNodes;
-	private Map<Cluster, Map<Node, NodeConnection>> failNodes;
-	private Map<Node, NodeConnection> failSlaveNodes;
-	private Map<Node, Integer> failNodeSerial;
+	private Map<Node, NodeConnection> nodes;
+	private List<Node> fails;
 	private List<Cluster> clusters;
 
 	private HeartBeat() {
@@ -31,34 +31,31 @@ public class HeartBeat extends Thread {
 		return beat;
 	}
 
+	// 初始化
 	public HeartBeat init(List<Cluster> clusters) {
-		cNodes = new ConcurrentHashMap<>();
-		failNodes = new ConcurrentHashMap<>(6);
-		failNodeSerial = new ConcurrentHashMap<>();
-		failSlaveNodes = new ConcurrentHashMap<>();
 		this.clusters = clusters;
-		Map<Node, NodeConnection> nConn;
+		this.nodes = new LinkedHashMap<>();
+		this.fails = new LinkedList<>();
 		NodeConnection conn;
 		for (Cluster cluster : clusters) {
-			nConn = new HashMap<>(cluster.getNodes().size());
+			// 每个集群的master
 			for (Node master : cluster.getNodes()) {
 				conn = new NodeConnection(master.getHost(), master.getPort());
 				conn.connect();
 				if (isConnected(conn)) {
 					slaveofNoOne(conn);
 				}
-				nConn.put(master, conn);
-				List<Node> slaves = master.getSlaves();
-				for (Node slave : slaves) {
-					NodeConnection sConn = new NodeConnection(slave.getHost(), slave.getPort());
-					sConn.connect();
-					if (isConnected(sConn)) {
-						slaveof(sConn, master.getHost(), master.getPort());
+				nodes.put(master, conn);
+				// 每个master的slave
+				for (Node slave : master.getSlaves()) {
+					conn = new NodeConnection(slave.getHost(), slave.getPort());
+					conn.connect();
+					if (isConnected(conn)) {
+						slaveof(conn, master.getHost(), master.getPort());
 					}
-					nConn.put(slave, sConn);
+					nodes.put(slave, conn);
 				}
 			}
-			cNodes.put(cluster, nConn);
 		}
 		conn = null;
 		return this;
@@ -77,7 +74,6 @@ public class HeartBeat extends Thread {
 					LOG.error(e.getMessage(), e);
 				}
 			}
-			recoverySlave();
 			// every sec
 			// LockSupport.parkNanos(3000000L);
 			try {
@@ -88,23 +84,23 @@ public class HeartBeat extends Thread {
 		}
 	}
 
+	// 检测是否宕
 	private boolean failOver() {
 		boolean resetConfig = false;
-		for (Entry<Cluster, Map<Node, NodeConnection>> entry : cNodes.entrySet()) {
-			Cluster cluster = entry.getKey();
-			for (Entry<Node, NodeConnection> e : entry.getValue().entrySet()) {
-				Node node = e.getKey();
-				int index = cluster.getIndex(node);
-				// it's not a master
-				if (index < 0) {
-					continue;
-				}
-				// master is connneted
-				if (!isConnected(e.getValue())) {
-					resetConfig = autoPromotionAndRmFail(cluster, node, index, e.getValue());
-				}
+		Node failMaster;
+		for (Entry<Node, NodeConnection> e : nodes.entrySet()) {
+			failMaster = e.getKey();
+			// it's not a master
+			if (failMaster.getFlag() == Constant.SLAVE || fails.contains(failMaster)) {
+				continue;
 			}
+			// master is connneted
+			if (!isConnected(e.getValue())) {
+				resetConfig = autoPromotionAndRmFail(failMaster, e.getValue());
+			}
+
 		}
+		failMaster = null;
 		return resetConfig;
 	}
 
@@ -114,41 +110,33 @@ public class HeartBeat extends Thread {
 	 * @param node
 	 */
 
-	private boolean autoPromotionAndRmFail(Cluster cluster, Node failMaster, int index, NodeConnection conn) {
-		boolean opt = false;
-		Node slave = null;
+	private boolean autoPromotionAndRmFail(Node failMaster, NodeConnection conn) {
+		Node newMaster = null;
+		int index = -1;
 		try {
-			for (int i = 0; i < failMaster.getSlaves().size(); i++) {
-				slave = failMaster.getSlaves().get(i);
-				if (isConnected(cNodes.get(cluster).get(slave))) {
-					opt = true;
+			for (Node node : failMaster.getSlaves()) {
+				if (isConnected(nodes.get(node))) {
+					newMaster = node;
 					break;
 				}
 			}
+			index = failMaster.getCluster().getIndex(failMaster);
 			// is node a master
-			if (opt && slave.switchRole()) {
-				slaveofNoOne(cNodes.get(cluster).get(slave));
-				slaveInit(cluster, slave.getSlaves());
-				cluster.setNode(index, slave);
-				failSlaveNodes.put(failMaster, conn);
+			if (null != newMaster && newMaster.switchRole()) {
+				slaveofNoOne(nodes.get(newMaster));
+				slaveInit(newMaster);
+				newMaster.getCluster().setNode(index, newMaster);
 			} else {
 				// cluster remove the fail node
-				cluster.remove(failMaster);
-				if (failNodes.get(cluster) == null) {
-					failNodes.put(cluster, new HashMap<Node, NodeConnection>());
-				}
-				// put it in fail contain
-				failNodes.get(cluster).put(failMaster, conn);
-				// record the index, and after recovery put it
-				// in
-				failNodeSerial.put(failMaster, index);
-				// don't check it on this method before recovery
-				cNodes.get(cluster).remove(failMaster);
-				opt = true;
+				failMaster.getCluster().remove(index);
 			}
+			fails.add(failMaster);
+			return true;
 		} catch (Exception e) {
+			return false;
+		} finally {
+			newMaster = null;
 		}
-		return opt;
 	}
 
 	/**
@@ -156,53 +144,31 @@ public class HeartBeat extends Thread {
 	 * 
 	 * @return
 	 */
-
 	private boolean recoveryFail() {
-		boolean resetConfig = false;
-		Cluster cluster;
-		Node node;
-		for (Entry<Cluster, Map<Node, NodeConnection>> fails : failNodes.entrySet()) {
-			cluster = fails.getKey();
-			for (Entry<Node, NodeConnection> nc : fails.getValue().entrySet()) {
-				node = nc.getKey();
-				try{
-					nc.getValue().connect();
-				} catch(Exception e) {
-					LOG.error(StringUtil.append(node.toAddr(), " still disconnected"), e);
-				}
-				if (isConnected(nc.getValue())) {
-					cluster.addNode(failNodeSerial.get(node), node);
-					cNodes.get(cluster).put(node, nc.getValue());
-					failNodes.remove(fails.getKey());
-					failNodeSerial.remove(node);
-					resetConfig = true;
-				}
-			}
-		}
-		node = null;
-		cluster = null;
-		return resetConfig;
-	}
-
-	/**
-	 * this is master down to slave and after recovery slave to it's master
-	 */
-
-	private void recoverySlave() {
-		Node node;
-		for (Entry<Node, NodeConnection> entry : failSlaveNodes.entrySet()) {
-			node = entry.getKey();
+		Node fail;
+		NodeConnection conn;
+		Iterator<Node> it = fails.iterator();
+		boolean wire = false;
+		while (it.hasNext()) {
+			fail = it.next();
+			conn = nodes.get(fail);
 			try {
-				entry.getValue().connect();
-			} catch(Exception e) {
-				LOG.error(StringUtil.append(node.toAddr(), " still disconnected"), e);
+				conn.connect();
+			} catch (Exception e) {
+				LOG.error(StringUtil.append(fail.toAddr(), " still disconnected"));
+				continue;
 			}
-			if (isConnected(entry.getValue()) && node.getMaster() != null) {
-				slaveof(entry.getValue(), node.getMaster().getHost(), node.getMaster().getPort());
-				failSlaveNodes.remove(node);
+			if (isConnected(conn)) {
+				if (fail.getFlag() == Constant.MASTER) {
+					fail.getCluster().setNode(fail.getCluster().getIndex(fail), fail);
+					wire = true;
+				} else if (fail.getFlag() == Constant.SLAVE) {
+					slaveof(conn, fail.getMaster().getHost(), fail.getMaster().getPort());
+				}
+				fails.remove(fail);
 			}
 		}
-		node = null;
+		return wire;
 	}
 
 	/**
@@ -228,13 +194,12 @@ public class HeartBeat extends Thread {
 	 * @param c
 	 * @param slaves
 	 */
-	private void slaveInit(Cluster c, List<Node> slaves) {
-		Map<Node, NodeConnection> nodes = cNodes.get(c);
+	private void slaveInit(Node master) {
 		NodeConnection conn;
-		for (Node slave : slaves) {
+		for (Node slave : master.getSlaves()) {
 			if ((conn = nodes.get(slave)) != null) {
 				if (isConnected(conn)) {
-					slaveof(conn, slave.getMaster().getHost(), slave.getMaster().getPort());
+					slaveof(conn, master.getHost(), master.getPort());
 				}
 			}
 		}
@@ -246,7 +211,8 @@ public class HeartBeat extends Thread {
 	}
 
 	private String slaveofNoOne(NodeConnection conn) {
-		conn.sendCommand(Protocol.Command.SLAVEOF, new byte[][] { Protocol.Keyword.NO.raw, Protocol.Keyword.ONE.raw });
+		conn.sendCommand(Protocol.Command.SLAVEOF, new byte[][] { Protocol.Keyword.NO.raw,
+				Protocol.Keyword.ONE.raw });
 		return conn.getStatusCodeReply();
 	}
 }

@@ -3,6 +3,7 @@ package com.sosop.cache.redis.node;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.sosop.cache.redis.cluster.Cluster;
 import com.sosop.cache.redis.utils.Constant;
 import com.sosop.cache.redis.utils.StringUtil;
 
@@ -19,6 +20,7 @@ public class Node {
 	private int flag;
 	private List<Node> slaves;
 	private Node master;
+	private Cluster cluster;
 
 	public Node() {
 		this.slaves = new ArrayList<>(MAX_SLAVES);
@@ -95,6 +97,14 @@ public class Node {
 
 	public void setMaster(Node master) {
 		this.master = master;
+	}
+	
+	public Cluster getCluster() {
+		return cluster;
+	}
+
+	public void setCluster(Cluster cluster) {
+		this.cluster = cluster;
 	}
 
 	public boolean switchRole() {

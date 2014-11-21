@@ -25,7 +25,9 @@ public class ClientFactoryTest {
 	
 	@Test
 	public void testGet() throws TException {
-		assertThat(client.get("1", "thrift-test"), Matchers.notNullValue());
+		for (int i = 0; i < 10000000; i++) {
+			assertThat(client.get("1", "thrift-test"), Matchers.notNullValue());
+		}
 	}
 	
 	@Test

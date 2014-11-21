@@ -73,7 +73,6 @@ public class XMLParse {
 					// get nodes
 					for (Element nodeE : e.getChildren("node")) {
 						node = NodeFactory.create();
-
 						for (Element nInfo : nodeE.getChildren()) {
 							if ("flag".equalsIgnoreCase(nInfo.getName()) && Constant.MASTER == Integer.parseInt(nInfo.getValue())) {
 								cluster.addNode(node);
@@ -91,6 +90,7 @@ public class XMLParse {
 							}
 							autoConfig(node, nInfo.getName(), nInfo.getValue(), fields(Node.class));
 						}
+						node.setCluster(cluster);
 					}
 
 					// get pool setting
@@ -194,7 +194,7 @@ public class XMLParse {
 		String property;
 		for (Field f : fields(Node.class)) {
 			property = f.getName();
-			if (!(property.equals("master") || property.equals("slaves") || property.equals("MAX_SLAVES"))) {
+			if ( !(property.equals("master") || property.equals("slaves") || property.equals("cluster") || property.equals("MAX_SLAVES")) ) {
 				Element nf = new Element(property);
 				nf.addContent(BeanUtils.getProperty(node, f.getName()));
 				n.addContent(nf);
