@@ -100,15 +100,21 @@ public abstract class Command {
 	protected Object invoke(String methodName, Object[] args, Class<?>... parameterTypes) {
 		Object ret = null;
 
-		ShardedJedis jedis = pool.getResource();
+		ShardedJedis jedis = null;
 		try {
 			/*
 			 * Method method = clazz.getMethod(methodName, parameterTypes); ret
 			 * = method.invoke(jedis, args);
 			 */
+			jedis = pool.getResource();
 			ret = access.invoke(jedis, methodName, parameterTypes, args);
 			if (Settings.getInstance().isHitCount()) {
 				Hits.getInstance().log(args[0], methodName, ret);
+			}
+		} catch (SecurityException | IllegalArgumentException e) {
+			LOG.error(e.getMessage(), e);
+			if (null != jedis) {
+				pool.returnBrokenResource(jedis);
 			}
 		} catch (NoSuchElementException | JedisConnectionException e) {
 			LOG.error("one redis server is downtime, please checked it");
@@ -119,11 +125,6 @@ public abstract class Command {
 				HeartBeat.get().promotion();
 				jedis = pool.getResource();
 				ret = access.invoke(jedis, methodName, parameterTypes, args);
-			}
-		} catch (SecurityException | IllegalArgumentException e) {
-			LOG.error(e.getMessage(), e);
-			if (null != jedis) {
-				pool.returnBrokenResource(jedis);
 			}
 		} finally {
 			if (null != jedis) {
