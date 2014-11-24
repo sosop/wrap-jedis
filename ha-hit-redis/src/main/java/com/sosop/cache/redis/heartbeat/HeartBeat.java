@@ -17,7 +17,7 @@ import com.sosop.cache.redis.utils.Constant;
 import com.sosop.cache.redis.utils.StringUtil;
 import com.sosop.cache.redis.utils.XMLParse;
 
-public class HeartBeat extends Thread {
+public class HeartBeat {
 	private final Logger LOG = Logger.getLogger(HeartBeat.class);
 	private final static HeartBeat beat = new HeartBeat();
 	private Map<Node, NodeConnection> nodes;
@@ -61,24 +61,14 @@ public class HeartBeat extends Thread {
 		return this;
 	}
 
-	@Override
 	public void run() {
-		while (true) {
-			if (failOver() || recoveryFail()) {
-				for (Cluster c : clusters) {
-					c.wireFault();
-				}
-				try {
-					XMLParse.toXML(clusters);
-				} catch (Exception e) {
-					LOG.error(e.getMessage(), e);
-				}
+		if (failOver() || recoveryFail()) {
+			for (Cluster c : clusters) {
+				c.wireFault();
 			}
-			// every sec
-			// LockSupport.parkNanos(3000000L);
 			try {
-				Thread.sleep(2000);
-			} catch (InterruptedException e) {
+				XMLParse.toXML(clusters);
+			} catch (Exception e) {
 				LOG.error(e.getMessage(), e);
 			}
 		}

@@ -38,7 +38,7 @@ public abstract class ClusterInfo {
 			Hits.getInstance().start();
 		}
 		if(Settings.getInstance().isReplication()){
-			HeartBeat.get().init(clusters).start();
+			HeartBeat.get().init(clusters);
 		}
 		map = new HashMap<>();
 		map.clear();

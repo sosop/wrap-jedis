@@ -6,6 +6,8 @@ public class Settings {
 	private boolean hitCount;
 
 	private boolean replication;
+	
+	private boolean autoSwitch;
 
 	private Settings() {
 	}
@@ -30,4 +32,11 @@ public class Settings {
 		this.replication = replication;
 	}
 
+	public boolean isAutoSwitch() {
+		return autoSwitch;
+	}
+
+	public void setAutoSwitch(boolean autoSwitch) {
+		this.autoSwitch = autoSwitch;
+	}
 }
