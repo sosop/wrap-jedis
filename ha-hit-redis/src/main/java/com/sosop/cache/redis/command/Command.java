@@ -11,6 +11,7 @@ import redis.clients.jedis.exceptions.JedisConnectionException;
 
 import com.esotericsoftware.reflectasm.MethodAccess;
 import com.sosop.cache.redis.global.settings.Settings;
+import com.sosop.cache.redis.heartbeat.HeartBeat;
 import com.sosop.cache.redis.statistics.Hits;
 
 public abstract class Command {
@@ -115,6 +116,7 @@ public abstract class Command {
 				pool.returnBrokenResource(jedis);
 			}
 			if (Settings.getInstance().isReplication() && Settings.getInstance().isAutoSwitch()) {
+				HeartBeat.get().promotion();
 				jedis = pool.getResource();
 				ret = access.invoke(jedis, methodName, parameterTypes, args);
 			}
