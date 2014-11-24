@@ -61,7 +61,7 @@ public class HeartBeat {
 		return this;
 	}
 
-	public void run() {
+	public void promotion() {
 		if (failOver() || recoveryFail()) {
 			for (Cluster c : clusters) {
 				c.wireFault();

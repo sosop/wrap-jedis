@@ -1,6 +1,7 @@
 package com.sosop.cache.redis.command;
 
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import org.apache.log4j.Logger;
 
@@ -108,7 +109,7 @@ public abstract class Command {
 			if (Settings.getInstance().isHitCount()) {
 				Hits.getInstance().log(args[0], methodName, ret);
 			}
-		} catch (JedisConnectionException e) {
+		} catch (NoSuchElementException | JedisConnectionException e) {
 			LOG.error("one redis server is downtime, please checked it");
 			if (null != jedis) {
 				pool.returnBrokenResource(jedis);
