@@ -11,7 +11,7 @@ import com.sosop.cache.redis.utils.FileUtil;
 
 public class Hits extends Thread {
 
-	private static final Logger LOG = Logger.getLogger(Hits.class);
+	private final Logger LOG = Logger.getLogger(Hits.class);
 
 	private final static Hits hit = new Hits();
 
@@ -36,9 +36,6 @@ public class Hits extends Thread {
 		}
 	}
 
-	
-	
-	
 	@Override
 	public void run() {
 		while (true) {

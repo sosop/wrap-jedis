@@ -21,28 +21,29 @@ public class Server {
 	private final static Logger LOG = Logger.getLogger(Server.class);
 
 	public static void main(String[] args) {
-		if(args.length != 1) {
+		String path = "/tmp/redis-cluster-final.xml";
+		if (args.length == 0 && Files.notExists(Paths.get(path), LinkOption.NOFOLLOW_LINKS)) {
 			LOG.error("please input redis clusters configuration file");
 			return;
 		}
-		final String path = args[0];
-		if(Files.notExists(Paths.get(path), LinkOption.NOFOLLOW_LINKS)) {
-			LOG.error("can not find the file, path does not exsit!");
+		if (args.length >= 1 && Files.notExists(Paths.get(path = args[0]), LinkOption.NOFOLLOW_LINKS)) {
+			LOG.error("can not find the file, path does not exist!");
 			return;
 		}
+		final String realPath = path;
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
-				new Server().startServer(path);
+				new Server().startServer(realPath);
 			}
 		}).start();
 	}
 
 	public void startServer(String path) {
 		try {
-			TNonblockingServerSocket  serverTransport = new TNonblockingServerSocket(9088); 
-			TProcessor processor = new Remote.Processor<Remote.Iface>(
-					new RemoteImp(new ClusterXML(path)));
+			TNonblockingServerSocket serverTransport = new TNonblockingServerSocket(9088);
+			TProcessor processor = new Remote.Processor<Remote.Iface>(new RemoteImp(new ClusterXML(
+					path)));
 			Args args = new Args(serverTransport);
 			args.processor(processor);
 			args.transportFactory(new TFramedTransport.Factory());
