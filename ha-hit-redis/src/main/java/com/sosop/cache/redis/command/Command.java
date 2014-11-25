@@ -640,26 +640,6 @@ public abstract class Command {
 				new Class[] { String.class }));
 	}
 
-	public long hSet(byte[] key, byte[] field, byte[] value) {
-		return (long) this.invoke("hset", new Object[] { key, field, value }, new Class[] {
-				byte[].class, byte[].class, byte[].class });
-	}
-
-	@SuppressWarnings("unchecked")
-	public Map<byte[], byte[]> hGetAll(byte[] key) {
-		return (Map<byte[], byte[]>) this.invoke("hgetAll", new Object[] { key },
-				new Class[] { byte[].class });
-	}
-
-	public byte[] hGet(byte[] key, byte[] field) {
-		return (byte[]) this.invoke("hget", new Object[] { key, field }, new Class[] {
-				byte[].class, byte[].class });
-	}
-
-	public long del(byte[] key) {
-		return (long) this.invoke("del", new Object[] { key }, byte[].class);
-	}
-
 	protected Object invoke(String methodName, Object[] args, Class<?>... parameterTypes) {
 		Object ret = null;
 		ShardedJedis jedis = null;

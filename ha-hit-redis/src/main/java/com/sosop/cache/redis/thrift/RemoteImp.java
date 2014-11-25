@@ -81,22 +81,22 @@ public class RemoteImp implements Remote.Iface {
 	@Override
 	public long hSet(String cluster, ByteBuffer key, ByteBuffer field, ByteBuffer value)
 			throws TException {
-		return info.cluster(ObjectUtil.object(cluster)).hSet(key.array(), field.array(), value.array());
+		return -1L;
 	}
 
 	@Override
 	@SuppressWarnings("all")
 	public Map hGetAll(String cluster, ByteBuffer key) throws TException {
-		return info.cluster(ObjectUtil.object(cluster)).hGetAll(key.array());
+		return null;
 	}
 
 	@Override
 	public ByteBuffer hGet(String cluster, ByteBuffer key, ByteBuffer field) throws TException {
-		return ByteBuffer.wrap(info.cluster(ObjectUtil.object(cluster)).hGet(key.array(), field.array()));
+		return null;
 	}
 
 	@Override
 	public long delB(String cluster, ByteBuffer key) throws TException {
-		return info.cluster(ObjectUtil.object(cluster)).del(key.array());
+		return -1L;
 	}
 }
