@@ -40,7 +40,7 @@ public class RemoteImp implements Remote.Iface {
 
 	@Override
 	public long rpushList(String cluster, String key, String values) throws TException {
-		return info.cluster(ObjectUtil.object(cluster)).rpushList(key, values);
+		return info.cluster(ObjectUtil.object(cluster)).rpush(key, values);
 	}
 
 	@Override
@@ -55,7 +55,7 @@ public class RemoteImp implements Remote.Iface {
 
 	@Override
 	public boolean exist(String cluster, String key) throws TException {
-		return info.cluster(ObjectUtil.object(cluster)).exist(key);
+		return info.cluster(ObjectUtil.object(cluster)).exists(key);
 	}
 
 	@Override
@@ -65,7 +65,7 @@ public class RemoteImp implements Remote.Iface {
 
 	@Override
 	public long saddSet(String cluster, String key, List<String> members) throws TException {
-		return info.cluster(ObjectUtil.object(cluster)).saddSet(key, ObjectUtil.CollectTo(members));
+		return info.cluster(ObjectUtil.object(cluster)).sadd(key, ObjectUtil.CollectTo(members));
 	}
 
 	@Override
