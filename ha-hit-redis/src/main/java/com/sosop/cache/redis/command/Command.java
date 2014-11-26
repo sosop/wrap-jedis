@@ -621,25 +621,6 @@ public abstract class Command {
 		return (long) this.invoke("pfcount", new String[] { key }, String.class);
 	}
 
-	public String lpopList(String key) {
-		return String.valueOf(this.invoke("lpop", new String[] { key }, String.class));
-	}
-
-	public boolean existInSet(String key, String member) {
-		return (boolean) this.invoke("sismember", new String[] { key, member }, new Class[] {
-				String.class, String.class });
-	}
-
-	public long sremSet(String key, String... members) {
-		return (long) this.invoke("srem", new Object[] { key, members }, new Class[] {
-				String.class, String[].class });
-	}
-
-	public String spopSet(String key) {
-		return String.valueOf(this.invoke("spop", new Object[] { key },
-				new Class[] { String.class }));
-	}
-
 	protected Object invoke(String methodName, Object[] args, Class<?>... parameterTypes) {
 		Object ret = null;
 		ShardedJedis jedis = null;

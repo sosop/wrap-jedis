@@ -35,7 +35,7 @@ public class RemoteImp implements Remote.Iface {
 
 	@Override
 	public String lpopList(String cluster, String key) throws TException {
-		return info.cluster(ObjectUtil.object(cluster)).lpopList(key);
+		return info.cluster(ObjectUtil.object(cluster)).lpop(key);
 	}
 
 	@Override
@@ -60,7 +60,7 @@ public class RemoteImp implements Remote.Iface {
 
 	@Override
 	public boolean existInSet(String cluster, String key, String member) throws TException {
-		return info.cluster(ObjectUtil.object(cluster)).existInSet(key, member);
+		return info.cluster(ObjectUtil.object(cluster)).sismember(key, member);
 	}
 
 	@Override
@@ -70,12 +70,12 @@ public class RemoteImp implements Remote.Iface {
 
 	@Override
 	public long sremSet(String cluster, String key, List<String> members) throws TException {
-		return info.cluster(ObjectUtil.object(cluster)).sremSet(key, ObjectUtil.CollectTo(members));
+		return info.cluster(ObjectUtil.object(cluster)).srem(key, ObjectUtil.CollectTo(members));
 	}
 
 	@Override
 	public String spopSet(String cluster, String key) throws TException {
-		return info.cluster(ObjectUtil.object(cluster)).spopSet(key);
+		return info.cluster(ObjectUtil.object(cluster)).spop(key);
 	}
 
 	@Override
