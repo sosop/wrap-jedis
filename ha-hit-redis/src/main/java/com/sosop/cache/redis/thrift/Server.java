@@ -22,13 +22,19 @@ public class Server {
 
 	public static void main(String[] args) {
 		String path = "/tmp/redis-cluster-final.xml";
-		if (args.length == 0 && Files.notExists(Paths.get(path), LinkOption.NOFOLLOW_LINKS)) {
+		
+		if(args.length == 0 && Files.notExists(Paths.get(path), LinkOption.NOFOLLOW_LINKS)) {
 			LOG.error("please input redis clusters configuration file");
 			return;
 		}
-		if (args.length >= 1 && Files.notExists(Paths.get(path = args[0]), LinkOption.NOFOLLOW_LINKS)) {
-			LOG.error("can not find the file, path does not exist!");
-			return;
+		
+		if (args.length >= 1) {
+			if(Files.exists(Paths.get(args[0]), LinkOption.NOFOLLOW_LINKS)) {
+				path = args[0];
+			} else if(Files.notExists(Paths.get(path), LinkOption.NOFOLLOW_LINKS)) {
+				LOG.error("can not find the file, path does not exist!");
+				return;
+			}
 		}
 		final String realPath = path;
 		new Thread(new Runnable() {
