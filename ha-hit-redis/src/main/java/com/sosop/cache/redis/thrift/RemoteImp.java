@@ -618,8 +618,7 @@ public class RemoteImp implements Remote.Iface {
 
 	@Override
 	public long dels(String cluster, String key) throws TException {
-		
-		return 0;
+		return info.cluster(ObjectUtil.object(cluster)).del(key);
 	}
 
 	@Override
