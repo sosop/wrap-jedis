@@ -18,12 +18,12 @@ public class ClientFactoryTest {
 
 	@Test
 	public void testSet() throws TException {
-		assertThat(client.sets("aota", "thrift-test", "i hope ..."), Matchers.is("OK"));
+		assertThat(client.sets("aota", "thrift-jedis", "i hope ..."), Matchers.is("OK"));
 	}
 
 	@Test
 	public void testGet() throws TException {
-		assertThat(client.get("1", "thrift-test"), Matchers.notNullValue());
+		assertThat(client.get("1", "thrift-jedis"), Matchers.notNullValue());
 	}
 
 	@Test
