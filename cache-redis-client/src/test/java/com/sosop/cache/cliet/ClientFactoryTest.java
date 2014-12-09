@@ -23,7 +23,7 @@ public class ClientFactoryTest {
 
 	@Test
 	public void testGet() throws TException {
-		assertThat(client.get("1", "thrift-jedis"), Matchers.notNullValue());
+		assertThat(client.get("1", "my-test"), Matchers.notNullValue());
 	}
 
 	@Test

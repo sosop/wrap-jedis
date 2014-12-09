@@ -40,6 +40,6 @@ public class Log {
 	
 	@Override
 	public String toString() {
-		return StringUtil.append(key, "---", methodName, "---", result);
+		return StringUtil.append(key, "          ", methodName, "          ", result);
 	}
 }
