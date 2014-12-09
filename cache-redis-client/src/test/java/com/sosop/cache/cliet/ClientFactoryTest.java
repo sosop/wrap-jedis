@@ -27,6 +27,11 @@ public class ClientFactoryTest {
 	}
 
 	@Test
+	public void testLpop() throws TException {
+		assertThat(client.lpop("1", "thrift-test"), Matchers.notNullValue());
+	}
+	
+	@Test
 	public void testDel() throws TException {
 		assertThat(client.dels("1", "thrift-test"), Matchers.greaterThan(0L));
 	}
