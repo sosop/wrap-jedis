@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.concurrent.locks.LockSupport;
 
 import org.apache.log4j.Logger;
 
@@ -39,12 +40,34 @@ public class FileUtil {
 		if (StringUtil.isNull(path)) {
 			path = DEFAUL_PATH;
 		}
+		FileLock lock = null;
 		try (RandomAccessFile rf = new RandomAccessFile(path, "rw");
 				FileChannel channel = rf.getChannel();) {
-			channel.position(channel.size());
-			channel.write(MappedByteBuffer.wrap(StringUtil.append(value, "\n").getBytes()));
-		} catch (IOException e) {
+			ByteBuffer buf = MappedByteBuffer.wrap(StringUtil.append(value, "\n").getBytes());
+			while (true) {
+				try {
+					lock = channel.tryLock(channel.size() + 1, buf.limit(), false);
+					break;
+				} catch (OverlappingFileLockException e) {
+					LockSupport.parkNanos(100);
+				}
+			}
+			if (null != lock && lock.isValid()) {
+				channel.position(channel.size());
+				channel.write(buf);
+			}
+		} catch (Exception e) {
 			LOG.error(e.getMessage(), e);
+		} finally {
+			try {
+				if (null != lock && lock.isValid()) {
+					lock.release();
+					lock = null;
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 

@@ -248,10 +248,12 @@ public class XMLParse {
 		replication.addContent(String.valueOf(Settings.getInstance().isReplication()));
 		Element  hitCount = new Element("hitCount");
 		hitCount.addContent(String.valueOf(Settings.getInstance().isHitCount()));
-		settings.addContent(replication);
-		settings.addContent(hitCount);
 		Element  autoSwitch = new Element("autoSwitch");
 		autoSwitch.addContent(String.valueOf(Settings.getInstance().isAutoSwitch()));
+		settings.addContent(replication);
+		settings.addContent(hitCount);
+		settings.addContent(autoSwitch);
+		
 		root.addContent(settings);
 		
 		Document doc = new Document(root);

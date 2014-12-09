@@ -15,7 +15,7 @@
 	<name>cache-redis-client</name>
 
 	<build>
-		<finalName>cache-redis</finalName>
+		<finalName>cache-redis-client</finalName>
 		<pluginManagement>
 			<plugins>
 				<plugin>

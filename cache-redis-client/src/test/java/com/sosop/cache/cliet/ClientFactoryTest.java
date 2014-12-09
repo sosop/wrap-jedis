@@ -18,7 +18,7 @@ public class ClientFactoryTest {
 
 	@Test
 	public void testSet() throws TException {
-		assertThat(client.sets("aota", "thrift-jedis", "i hope ..."), Matchers.is("OK"));
+		assertThat(client.sets("aota", "my-test", "just a test"), Matchers.is("OK"));
 	}
 
 	@Test
