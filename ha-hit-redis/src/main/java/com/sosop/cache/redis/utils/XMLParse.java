@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
@@ -194,7 +195,7 @@ public class XMLParse {
 		String property;
 		for (Field f : fields(Node.class)) {
 			property = f.getName();
-			if ( !(property.equals("master") || property.equals("slaves") || property.equals("cluster") || property.equals("MAX_SLAVES")) ) {
+			if ( !(property.equals("master") || property.equals("slaves") || property.equals("cluster") || Modifier.isStatic(f.getModifiers())) ) {
 				Element nf = new Element(property);
 				nf.addContent(BeanUtils.getProperty(node, f.getName()));
 				n.addContent(nf);
@@ -214,7 +215,7 @@ public class XMLParse {
 		String value;
 		for (Field f : fields(GenericObjectPoolConfig.class, BaseObjectPoolConfig.class)) {
 			property = f.getName();
-			if (!property.startsWith("DEFAULT") && StringUtil.notNull(value = BeanUtils.getProperty(config, f.getName()))) {
+			if (!Modifier.isStatic(f.getModifiers()) && StringUtil.notNull(value = BeanUtils.getProperty(config, f.getName()))) {
 				Element nf = new Element(property);
 				nf.addContent(value);
 				n.addContent(nf);
